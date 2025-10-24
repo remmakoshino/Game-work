@@ -20,7 +20,13 @@ export default function Character3D({ animation = 'idle' }) {
     dancePattern: 0,
     lastBlink: 0,
     lastWink: 0,
-    lastSpin: 0
+    lastSpin: 0,
+    walkPhase: 0,
+    targetX: 0,
+    currentX: 0,
+    isWalking: false,
+    isRunning: false,
+    lastMovement: 0
   })
 
   // VRMモデルのロード
@@ -187,7 +193,133 @@ export default function Character3D({ animation = 'idle' }) {
     return false
   }
 
-  // アイドルダンスの振り付けパターン
+  // 歩行・走行アニメーション
+  const updateWalkRun = (vrm, time, animState) => {
+    if (!vrm.humanoid) return
+    
+    const leftLeg = vrm.humanoid.getNormalizedBoneNode('leftUpperLeg')
+    const rightLeg = vrm.humanoid.getNormalizedBoneNode('rightUpperLeg')
+    const leftLowerLeg = vrm.humanoid.getNormalizedBoneNode('leftLowerLeg')
+    const rightLowerLeg = vrm.humanoid.getNormalizedBoneNode('rightLowerLeg')
+    const leftFoot = vrm.humanoid.getNormalizedBoneNode('leftFoot')
+    const rightFoot = vrm.humanoid.getNormalizedBoneNode('rightFoot')
+    const leftArm = vrm.humanoid.getNormalizedBoneNode('leftUpperArm')
+    const rightArm = vrm.humanoid.getNormalizedBoneNode('rightUpperArm')
+    const spine = vrm.humanoid.getNormalizedBoneNode('spine')
+    
+    const speed = animState.isRunning ? 8 : 4 // 走る時は2倍速
+    const amplitude = animState.isRunning ? 0.8 : 0.5 // 走る時は振りが大きい
+    const armSwing = animState.isRunning ? 0.6 : 0.4
+    
+    const walkCycle = (time * speed) % (Math.PI * 2)
+    
+    // 脚の動き
+    if (leftLeg) {
+      leftLeg.rotation.x = Math.sin(walkCycle) * amplitude
+    }
+    if (rightLeg) {
+      rightLeg.rotation.x = Math.sin(walkCycle + Math.PI) * amplitude
+    }
+    
+    // 膝の曲げ
+    if (leftLowerLeg) {
+      leftLowerLeg.rotation.x = Math.max(0, -Math.sin(walkCycle) * amplitude * 0.8)
+    }
+    if (rightLowerLeg) {
+      rightLowerLeg.rotation.x = Math.max(0, -Math.sin(walkCycle + Math.PI) * amplitude * 0.8)
+    }
+    
+    // 足首
+    if (leftFoot) {
+      leftFoot.rotation.x = Math.sin(walkCycle) * 0.3
+    }
+    if (rightFoot) {
+      rightFoot.rotation.x = Math.sin(walkCycle + Math.PI) * 0.3
+    }
+    
+    // 腕の振り
+    if (leftArm) {
+      leftArm.rotation.x = Math.sin(walkCycle + Math.PI) * armSwing
+      leftArm.rotation.z = 0.2
+    }
+    if (rightArm) {
+      rightArm.rotation.x = Math.sin(walkCycle) * armSwing
+      rightArm.rotation.z = -0.2
+    }
+    
+    // 体の前傾（走る時）
+    if (spine && animState.isRunning) {
+      spine.rotation.x = 0.2
+    }
+    
+    // 上下の動き
+    const bobAmount = animState.isRunning ? 0.15 : 0.08
+    return Math.abs(Math.sin(walkCycle)) * bobAmount
+  }
+
+  // 横移動の管理
+  const updateMovement = (vrm, time, animState) => {
+    const movementInterval = 6.0 // 6秒ごとに移動パターン変更
+    
+    if (time - animState.lastMovement > movementInterval) {
+      animState.lastMovement = time
+      
+      // ランダムに移動パターンを決定
+      const pattern = Math.random()
+      
+      if (pattern < 0.3) {
+        // 歩いて左へ
+        animState.isWalking = true
+        animState.isRunning = false
+        animState.targetX = -2.5
+      } else if (pattern < 0.6) {
+        // 歩いて右へ
+        animState.isWalking = true
+        animState.isRunning = false
+        animState.targetX = 2.5
+      } else if (pattern < 0.75) {
+        // 走って左へ
+        animState.isWalking = true
+        animState.isRunning = true
+        animState.targetX = -3.0
+      } else if (pattern < 0.9) {
+        // 走って右へ
+        animState.isWalking = true
+        animState.isRunning = true
+        animState.targetX = 3.0
+      } else {
+        // 中央に戻る
+        animState.isWalking = true
+        animState.isRunning = false
+        animState.targetX = 0
+      }
+    }
+    
+    // 移動処理
+    if (animState.isWalking) {
+      const moveSpeed = animState.isRunning ? 0.08 : 0.04
+      const diff = animState.targetX - animState.currentX
+      
+      if (Math.abs(diff) > 0.1) {
+        // 移動方向を向く
+        if (diff > 0) {
+          vrm.scene.rotation.y = THREE.MathUtils.lerp(vrm.scene.rotation.y, Math.PI * 0.15, 0.1)
+        } else {
+          vrm.scene.rotation.y = THREE.MathUtils.lerp(vrm.scene.rotation.y, -Math.PI * 0.15, 0.1)
+        }
+        
+        animState.currentX += Math.sign(diff) * moveSpeed
+        vrm.scene.position.x = animState.currentX
+      } else {
+        // 到着したら停止して正面を向く
+        animState.isWalking = false
+        animState.isRunning = false
+        vrm.scene.rotation.y = THREE.MathUtils.lerp(vrm.scene.rotation.y, 0, 0.1)
+      }
+    }
+    
+    return animState.isWalking
+  }
   const updateIdolDance = (vrm, time, animState) => {
     const beat = time * 2 // BPM 120相当
     const pattern = Math.floor(beat / 4) % 6 // 6パターンのループ
@@ -362,24 +494,51 @@ export default function Character3D({ animation = 'idle' }) {
     if (animation === 'dance' && !isSpinning) {
       // ダンスモード
       
-      // ジャンプ
-      vrm.scene.position.y = updateJump(time, -1.5)
+      // 横移動チェック
+      const isMoving = updateMovement(vrm, time, animState)
       
-      // 体の向き（基本正面、時々振り向く）
-      const turnCycle = Math.floor(time * 2) % 16
-      if (turnCycle < 2) {
-        vrm.scene.rotation.y = Math.sin(time * Math.PI * 4) * 0.3
+      if (isMoving) {
+        // 歩行・走行中
+        const walkBob = updateWalkRun(vrm, time, animState)
+        vrm.scene.position.y = -1.5 + walkBob
+        
+        // 移動中も少し表情を
+        updateBlink(vrm, time, animState)
+        updateMouth(vrm, time, true)
+        
+        // 走行中の追加演出
+        if (animState.isRunning) {
+          setExpression(vrm, 'happy', 0.8)
+          // 髪が流れる演出（頭を少し後ろに）
+          if (vrm.humanoid) {
+            const head = vrm.humanoid.getNormalizedBoneNode('head')
+            if (head) {
+              head.rotation.x = 0.1
+            }
+          }
+        }
       } else {
-        vrm.scene.rotation.y = Math.sin(time * 0.5) * 0.1
+        // ステージダンス中
+        
+        // ジャンプ
+        vrm.scene.position.y = updateJump(time, -1.5)
+        
+        // 体の向き（基本正面、時々振り向く）
+        const turnCycle = Math.floor(time * 2) % 16
+        if (turnCycle < 2) {
+          vrm.scene.rotation.y = Math.sin(time * Math.PI * 4) * 0.3
+        } else {
+          vrm.scene.rotation.y = Math.sin(time * 0.5) * 0.1
+        }
+        
+        // アイドルダンスの振り付け
+        updateIdolDance(vrm, time, animState)
+        
+        // 表情
+        updateBlink(vrm, time, animState)
+        updateWink(vrm, time, animState)
+        updateMouth(vrm, time, true)
       }
-      
-      // アイドルダンスの振り付け
-      updateIdolDance(vrm, time, animState)
-      
-      // 表情
-      updateBlink(vrm, time, animState)
-      updateWink(vrm, time, animState)
-      updateMouth(vrm, time, true)
       
     } else if (!isSpinning) {
       // アイドルモード
