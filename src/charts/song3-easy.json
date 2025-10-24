@@ -1,0 +1,33 @@
+{
+  "id": "song3-easy",
+  "title": "虹色リズム",
+  "artist": "Rainbow Voice",
+  "bpm": 100,
+  "difficulty": "EASY",
+  "duration": 50000,
+  "notes": [
+    { "time": 3000, "lane": 0 },
+    { "time": 5000, "lane": 1 },
+    { "time": 7000, "lane": 2 },
+    { "time": 9000, "lane": 3 },
+    { "time": 11000, "lane": 1 },
+    { "time": 13000, "lane": 2 },
+    { "time": 15000, "lane": 0 },
+    { "time": 17000, "lane": 3 },
+    { "time": 19000, "lane": 1 },
+    { "time": 21000, "lane": 2 },
+    { "time": 23000, "lane": 0 },
+    { "time": 25000, "lane": 3 },
+    { "time": 27000, "lane": 1 },
+    { "time": 29000, "lane": 2 },
+    { "time": 31000, "lane": 0 },
+    { "time": 33000, "lane": 3 },
+    { "time": 35000, "lane": 1 },
+    { "time": 37000, "lane": 2 },
+    { "time": 39000, "lane": 0 },
+    { "time": 41000, "lane": 3 },
+    { "time": 43000, "lane": 1 },
+    { "time": 45000, "lane": 2 },
+    { "time": 47000, "lane": 3 }
+  ]
+}
