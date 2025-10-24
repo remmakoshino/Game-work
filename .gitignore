@@ -23,4 +23,5 @@ Thumbs.db
 npm-debug.log*
 
 # Large assets (optional - if models are too large)
-# public/models/*.vrm
+public/models/*.vrm
+public/audio/*.mp3
