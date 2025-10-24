@@ -3,7 +3,9 @@
 VRMキャラクターと一緒に楽しむ本格的なリズムゲーム！  
 ピンクツインテールの女の子が歌って踊る、アイドル風音ゲーです。
 
-![Game Screenshot](./docs/screenshot.png)
+![Game Screenshot1](./docs/キャプチャ1.png)
+![Game Screenshot2](./docs/キャプチャ2.png)
+![Game Screenshot3](./docs/キャプチャ3.png)
 
 ## ✨ 特徴
 
