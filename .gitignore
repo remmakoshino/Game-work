@@ -30,8 +30,8 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# VRM Models (ユーザーが各自用意)
-public/models/*.vrm
+# VRM Models - モデルファイルをリポジトリに含める
+# public/models/*.vrm
 
 # Audio Files (ユーザーが各自用意)
 public/audio/*.mp3

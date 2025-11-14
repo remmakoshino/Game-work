@@ -29,21 +29,22 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
       color: 'white',
       fontFamily: 'Arial, sans-serif',
       overflow: 'auto',
-      padding: '40px'
+      padding: 'clamp(20px, 4vw, 40px)'
     }}>
       <button
         onClick={onBack}
         style={{
           position: 'absolute',
-          top: '20px',
-          left: '20px',
-          padding: '10px 20px',
-          fontSize: '1rem',
+          top: 'clamp(10px, 2vw, 20px)',
+          left: 'clamp(10px, 2vw, 20px)',
+          padding: 'clamp(8px, 1.5vw, 10px) clamp(15px, 3vw, 20px)',
+          fontSize: 'clamp(0.8rem, 2vw, 1rem)',
           background: 'rgba(255, 255, 255, 0.2)',
           color: 'white',
           border: 'none',
           borderRadius: '8px',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          touchAction: 'manipulation'
         }}
       >
         ← BACK
@@ -51,19 +52,20 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
 
       <h1 style={{
         textAlign: 'center',
-        fontSize: '3rem',
-        marginBottom: '40px',
-        textShadow: '0 4px 6px rgba(0,0,0,0.3)'
+        fontSize: 'clamp(2rem, 6vw, 3rem)',
+        marginBottom: 'clamp(20px, 4vw, 40px)',
+        textShadow: '0 4px 6px rgba(0,0,0,0.3)',
+        paddingTop: 'clamp(40px, 8vw, 60px)'
       }}>
         🎵 SELECT SONG 🎵
       </h1>
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '30px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+        gap: 'clamp(15px, 3vw, 30px)',
         maxWidth: '1200px',
-        margin: '0 auto 40px'
+        margin: '0 auto clamp(20px, 4vw, 40px)'
       }}>
         {songs.map((song) => (
           <div
@@ -73,7 +75,7 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
               background: selectedSong?.id === song.id
                 ? 'rgba(102, 126, 234, 0.4)'
                 : 'rgba(255, 255, 255, 0.1)',
-              padding: '30px',
+              padding: 'clamp(20px, 4vw, 30px)',
               borderRadius: '15px',
               cursor: 'pointer',
               transition: 'all 0.3s',
@@ -81,7 +83,8 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
                 ? '3px solid #667eea'
                 : '3px solid transparent',
               backdropFilter: 'blur(10px)',
-              transform: selectedSong?.id === song.id ? 'scale(1.05)' : 'scale(1)'
+              transform: selectedSong?.id === song.id ? 'scale(1.05)' : 'scale(1)',
+              touchAction: 'manipulation'
             }}
             onMouseOver={(e) => {
               if (selectedSong?.id !== song.id) {
@@ -95,21 +98,21 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
             }}
           >
             <div style={{
-              fontSize: '5rem',
+              fontSize: 'clamp(3rem, 10vw, 5rem)',
               textAlign: 'center',
               marginBottom: '15px'
             }}>
               {song.image}
             </div>
             <h2 style={{
-              fontSize: '1.8rem',
+              fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
               marginBottom: '10px',
               textAlign: 'center'
             }}>
               {song.title}
             </h2>
             <p style={{
-              fontSize: '1.2rem',
+              fontSize: 'clamp(1rem, 3vw, 1.2rem)',
               opacity: 0.7,
               textAlign: 'center',
               marginBottom: '15px'
@@ -117,7 +120,7 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
               {song.artist}
             </p>
             <p style={{
-              fontSize: '1rem',
+              fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
               opacity: 0.6,
               textAlign: 'center'
             }}>
@@ -160,22 +163,23 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
           maxWidth: '600px',
           margin: '0 auto',
           background: 'rgba(255, 255, 255, 0.1)',
-          padding: '30px',
+          padding: 'clamp(20px, 4vw, 30px)',
           borderRadius: '15px',
           backdropFilter: 'blur(10px)'
         }}>
           <h3 style={{
-            fontSize: '1.5rem',
-            marginBottom: '20px',
+            fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
+            marginBottom: 'clamp(15px, 3vw, 20px)',
             textAlign: 'center'
           }}>
             SELECT DIFFICULTY
           </h3>
           <div style={{
             display: 'flex',
-            gap: '15px',
+            gap: 'clamp(8px, 2vw, 15px)',
             justifyContent: 'center',
-            marginBottom: '30px'
+            marginBottom: 'clamp(20px, 4vw, 30px)',
+            flexWrap: 'wrap'
           }}>
             {['EASY', 'NORMAL', 'HARD'].map((diff) => {
               const isAvailable = selectedSong.difficulties[diff]
@@ -186,8 +190,8 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
                   disabled={!isAvailable}
                   onClick={() => setSelectedDifficulty(diff)}
                   style={{
-                    padding: '15px 30px',
-                    fontSize: '1.3rem',
+                    padding: 'clamp(12px, 2.5vw, 15px) clamp(20px, 4vw, 30px)',
+                    fontSize: 'clamp(1rem, 3vw, 1.3rem)',
                     background: isSelected
                       ? DIFFICULTY_COLORS[diff]
                       : isAvailable
@@ -200,7 +204,8 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
                     fontWeight: 'bold',
                     transition: 'transform 0.2s',
                     transform: isSelected ? 'scale(1.1)' : 'scale(1)',
-                    opacity: isAvailable ? 1 : 0.5
+                    opacity: isAvailable ? 1 : 0.5,
+                    touchAction: 'manipulation'
                   }}
                   onMouseOver={(e) => {
                     if (isAvailable && !isSelected) {
@@ -223,8 +228,8 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
             onClick={handleStart}
             style={{
               width: '100%',
-              padding: '20px',
-              fontSize: '2rem',
+              padding: 'clamp(15px, 3vw, 20px)',
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',
               border: 'none',
@@ -232,7 +237,8 @@ export default function SongSelect({ songs, onSelect, onBack, getHighScore }) {
               cursor: 'pointer',
               fontWeight: 'bold',
               boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-              transition: 'transform 0.2s'
+              transition: 'transform 0.2s',
+              touchAction: 'manipulation'
             }}
             onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
             onMouseOut={(e) => e.target.style.transform = 'scale(1)'}

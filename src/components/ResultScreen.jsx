@@ -51,8 +51,9 @@ export default function ResultScreen({
       background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
       color: 'white',
       fontFamily: 'Arial, sans-serif',
-      overflow: 'hidden',
-      position: 'relative'
+      overflow: 'auto',
+      position: 'relative',
+      padding: 'clamp(10px, 2vw, 20px)'
     }}>
       {/* フルコンボエフェクト */}
       {showFullCombo && (
@@ -71,11 +72,13 @@ export default function ResultScreen({
             top: '10%',
             left: '50%',
             transform: 'translateX(-50%)',
-            fontSize: '4rem',
+            fontSize: 'clamp(2rem, 8vw, 4rem)',
             fontWeight: 'bold',
             color: '#FFD700',
             textShadow: '0 0 20px #FFD700, 0 0 40px #FFD700',
-            animation: 'bounce 1s infinite'
+            animation: 'bounce 1s infinite',
+            textAlign: 'center',
+            padding: '0 10px'
           }}>
             ✨ FULL COMBO ✨
           </div>
@@ -89,12 +92,14 @@ export default function ResultScreen({
           top: '20%',
           left: '50%',
           transform: 'translateX(-50%)',
-          fontSize: '2rem',
+          fontSize: 'clamp(1.5rem, 5vw, 2rem)',
           fontWeight: 'bold',
           color: '#FF69B4',
           textShadow: '0 0 15px #FF69B4',
           animation: 'pulse 1.5s infinite',
-          zIndex: 10
+          zIndex: 10,
+          textAlign: 'center',
+          padding: '0 10px'
         }}>
           🎉 NEW RECORD 🎉
         </div>
@@ -102,17 +107,18 @@ export default function ResultScreen({
 
       <div style={{
         background: 'rgba(255, 255, 255, 0.1)',
-        padding: '50px 80px',
+        padding: 'clamp(30px, 6vw, 50px) clamp(20px, 6vw, 80px)',
         borderRadius: '25px',
         backdropFilter: 'blur(15px)',
         textAlign: 'center',
         maxWidth: '800px',
+        width: '95%',
         boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
         position: 'relative',
         zIndex: 1
       }}>
         <h1 style={{
-          fontSize: '3.5rem',
+          fontSize: 'clamp(2rem, 7vw, 3.5rem)',
           marginBottom: '10px',
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           WebkitBackgroundClip: 'text',
@@ -124,16 +130,16 @@ export default function ResultScreen({
 
         {/* 楽曲情報 */}
         <div style={{
-          marginBottom: '30px',
-          padding: '15px',
+          marginBottom: 'clamp(20px, 4vw, 30px)',
+          padding: 'clamp(10px, 2vw, 15px)',
           background: 'rgba(255, 255, 255, 0.05)',
           borderRadius: '10px'
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: '5px' }}>
+          <div style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', marginBottom: '5px' }}>
             {song.image} {song.title}
           </div>
           <div style={{
-            fontSize: '1.2rem',
+            fontSize: 'clamp(1rem, 3vw, 1.2rem)',
             color: DIFFICULTY_COLORS[difficulty],
             fontWeight: 'bold'
           }}>
@@ -144,14 +150,14 @@ export default function ResultScreen({
         {/* ランクとスコア */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 2fr',
-          gap: '30px',
-          marginBottom: '30px'
+          gridTemplateColumns: window.innerWidth > 600 ? '1fr 2fr' : '1fr',
+          gap: 'clamp(15px, 3vw, 30px)',
+          marginBottom: 'clamp(20px, 4vw, 30px)'
         }}>
           {/* ランク */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.05)',
-            padding: '20px',
+            padding: 'clamp(15px, 3vw, 20px)',
             borderRadius: '15px',
             display: 'flex',
             flexDirection: 'column',
@@ -159,7 +165,7 @@ export default function ResultScreen({
             alignItems: 'center'
           }}>
             <div style={{
-              fontSize: '5rem',
+              fontSize: 'clamp(3rem, 10vw, 5rem)',
               fontWeight: 'bold',
               color: rankInfo.color,
               textShadow: `0 0 20px ${rankInfo.color}`,
@@ -167,7 +173,7 @@ export default function ResultScreen({
             }}>
               {rankInfo.rank}
             </div>
-            <div style={{ fontSize: '1rem', opacity: 0.7 }}>
+            <div style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)', opacity: 0.7 }}>
               {accuracy}%
             </div>
           </div>
@@ -175,18 +181,18 @@ export default function ResultScreen({
           {/* スコア */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.05)',
-            padding: '20px',
+            padding: 'clamp(15px, 3vw, 20px)',
             borderRadius: '15px'
           }}>
             <div style={{
-              fontSize: '1rem',
+              fontSize: 'clamp(0.8rem, 2vw, 1rem)',
               opacity: 0.7,
               marginBottom: '10px'
             }}>
               SCORE
             </div>
             <div style={{
-              fontSize: '3.5rem',
+              fontSize: 'clamp(2rem, 7vw, 3.5rem)',
               fontWeight: 'bold',
               color: '#FFD700',
               marginBottom: '15px'
@@ -194,7 +200,7 @@ export default function ResultScreen({
               {results.score.toLocaleString()}
             </div>
             <div style={{
-              fontSize: '0.9rem',
+              fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
               opacity: 0.6
             }}>
               HIGH SCORE: {highScore.toLocaleString()}
@@ -206,22 +212,22 @@ export default function ResultScreen({
         <div style={{
           display: 'flex',
           justifyContent: 'center',
-          gap: '30px',
-          marginBottom: '30px'
+          gap: 'clamp(15px, 3vw, 30px)',
+          marginBottom: 'clamp(20px, 4vw, 30px)'
         }}>
           <div style={{
             background: results.isFullCombo
               ? 'rgba(255, 215, 0, 0.2)'
               : 'rgba(255, 255, 255, 0.05)',
-            padding: '15px 30px',
+            padding: 'clamp(12px, 2.5vw, 15px) clamp(20px, 4vw, 30px)',
             borderRadius: '15px',
             border: results.isFullCombo ? '2px solid #FFD700' : 'none'
           }}>
-            <div style={{ fontSize: '0.9rem', opacity: 0.7, marginBottom: '5px' }}>
+            <div style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', opacity: 0.7, marginBottom: '5px' }}>
               MAX COMBO
             </div>
             <div style={{
-              fontSize: '2rem',
+              fontSize: 'clamp(1.5rem, 5vw, 2rem)',
               fontWeight: 'bold',
               color: results.isFullCombo ? '#FFD700' : '#FF69B4'
             }}>
@@ -233,79 +239,79 @@ export default function ResultScreen({
         {/* 判定詳細 */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '15px',
-          marginBottom: '40px'
+          gridTemplateColumns: window.innerWidth > 600 ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
+          gap: 'clamp(10px, 2vw, 15px)',
+          marginBottom: 'clamp(30px, 5vw, 40px)'
         }}>
           <div style={{
             background: 'rgba(255, 215, 0, 0.2)',
-            padding: '15px',
+            padding: 'clamp(10px, 2vw, 15px)',
             borderRadius: '12px',
             border: '2px solid rgba(255, 215, 0, 0.5)'
           }}>
             <div style={{
-              fontSize: '0.8rem',
+              fontSize: 'clamp(0.7rem, 2vw, 0.8rem)',
               marginBottom: '5px',
               color: '#FFD700',
               fontWeight: 'bold'
             }}>
               GREAT
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)', fontWeight: 'bold' }}>
               {results.judgments.GREAT}
             </div>
           </div>
           <div style={{
             background: 'rgba(144, 238, 144, 0.2)',
-            padding: '15px',
+            padding: 'clamp(10px, 2vw, 15px)',
             borderRadius: '12px',
             border: '2px solid rgba(144, 238, 144, 0.5)'
           }}>
             <div style={{
-              fontSize: '0.8rem',
+              fontSize: 'clamp(0.7rem, 2vw, 0.8rem)',
               marginBottom: '5px',
               color: '#90EE90',
               fontWeight: 'bold'
             }}>
               GOOD
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)', fontWeight: 'bold' }}>
               {results.judgments.GOOD}
             </div>
           </div>
           <div style={{
             background: 'rgba(135, 206, 235, 0.2)',
-            padding: '15px',
+            padding: 'clamp(10px, 2vw, 15px)',
             borderRadius: '12px',
             border: '2px solid rgba(135, 206, 235, 0.5)'
           }}>
             <div style={{
-              fontSize: '0.8rem',
+              fontSize: 'clamp(0.7rem, 2vw, 0.8rem)',
               marginBottom: '5px',
               color: '#87CEEB',
               fontWeight: 'bold'
             }}>
               NORMAL
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)', fontWeight: 'bold' }}>
               {results.judgments.NORMAL}
             </div>
           </div>
           <div style={{
             background: 'rgba(255, 107, 107, 0.2)',
-            padding: '15px',
+            padding: 'clamp(10px, 2vw, 15px)',
             borderRadius: '12px',
             border: '2px solid rgba(255, 107, 107, 0.5)'
           }}>
             <div style={{
-              fontSize: '0.8rem',
+              fontSize: 'clamp(0.7rem, 2vw, 0.8rem)',
               marginBottom: '5px',
               color: '#FF6B6B',
               fontWeight: 'bold'
             }}>
               MISS
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 'clamp(1.2rem, 4vw, 1.8rem)', fontWeight: 'bold' }}>
               {results.judgments.MISS}
             </div>
           </div>
@@ -314,14 +320,15 @@ export default function ResultScreen({
         {/* ボタン */}
         <div style={{
           display: 'flex',
-          gap: '20px',
-          justifyContent: 'center'
+          gap: 'clamp(10px, 3vw, 20px)',
+          justifyContent: 'center',
+          flexWrap: 'wrap'
         }}>
           <button
             onClick={onRestart}
             style={{
-              padding: '15px 40px',
-              fontSize: '1.5rem',
+              padding: 'clamp(12px, 2.5vw, 15px) clamp(30px, 5vw, 40px)',
+              fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',
               border: 'none',
@@ -329,7 +336,8 @@ export default function ResultScreen({
               cursor: 'pointer',
               fontWeight: 'bold',
               boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
-              transition: 'transform 0.2s'
+              transition: 'transform 0.2s',
+              touchAction: 'manipulation'
             }}
             onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
             onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
@@ -339,15 +347,16 @@ export default function ResultScreen({
           <button
             onClick={onToMenu}
             style={{
-              padding: '15px 40px',
-              fontSize: '1.5rem',
+              padding: 'clamp(12px, 2.5vw, 15px) clamp(30px, 5vw, 40px)',
+              fontSize: 'clamp(1.2rem, 3vw, 1.5rem)',
               background: 'rgba(255, 255, 255, 0.15)',
               color: 'white',
               border: '2px solid rgba(255, 255, 255, 0.3)',
               borderRadius: '12px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              transition: 'transform 0.2s'
+              transition: 'transform 0.2s',
+              touchAction: 'manipulation'
             }}
             onMouseOver={(e) => {
               e.target.style.transform = 'scale(1.05)'

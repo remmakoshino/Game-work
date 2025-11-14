@@ -112,25 +112,31 @@ function App() {
       alignItems: 'center',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       color: 'white',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: 'Arial, sans-serif',
+      padding: '20px'
     }}>
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', maxWidth: '600px' }}>
         <h1 style={{
-          fontSize: '4rem',
-          marginBottom: '2rem',
+          fontSize: 'clamp(2rem, 8vw, 4rem)',
+          marginBottom: '1.5rem',
           textShadow: '0 4px 6px rgba(0,0,0,0.3)',
           animation: 'pulse 2s infinite'
         }}>
           🎵 リズムゲーム 🎵
         </h1>
-        <p style={{ fontSize: '1.5rem', marginBottom: '3rem', opacity: 0.9 }}>
+        <p style={{ 
+          fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
+          marginBottom: '2rem', 
+          opacity: 0.9,
+          padding: '0 10px'
+        }}>
           ピンクツインテールの女の子とリズムに乗ろう！
         </p>
         <button
           onClick={() => setGameState('songSelect')}
           style={{
-            padding: '20px 60px',
-            fontSize: '2rem',
+            padding: 'clamp(15px, 3vw, 20px) clamp(40px, 8vw, 60px)',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
             background: 'rgba(255, 255, 255, 0.9)',
             color: '#667eea',
             border: 'none',
@@ -138,16 +144,25 @@ function App() {
             cursor: 'pointer',
             fontWeight: 'bold',
             boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-            transition: 'transform 0.2s'
+            transition: 'transform 0.2s',
+            touchAction: 'manipulation'
           }}
           onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
           onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          onTouchStart={(e) => e.target.style.transform = 'scale(1.1)'}
+          onTouchEnd={(e) => e.target.style.transform = 'scale(1)'}
         >
           START
         </button>
-        <div style={{ marginTop: '3rem', fontSize: '1rem', opacity: 0.7 }}>
-          <p>操作キー: D / F / J / K</p>
-          <p>ゲーム中スペースキーでスタート</p>
+        <div style={{ 
+          marginTop: '2rem', 
+          fontSize: 'clamp(0.8rem, 2vw, 1rem)', 
+          opacity: 0.7,
+          padding: '0 10px'
+        }}>
+          <p>PC: D / F / J / K キー</p>
+          <p>スマホ: タップで操作</p>
+          <p>ゲーム中スペース/タップでスタート</p>
         </div>
       </div>
       <style>{`

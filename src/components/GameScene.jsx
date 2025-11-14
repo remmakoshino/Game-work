@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, Text } from '@react-three/drei'
 import * as THREE from 'three'
@@ -108,7 +108,7 @@ function HitEffect({ lane, show }) {
 }
 
 // ゲームシーン本体
-function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
+const GameSceneContent = forwardRef(({ chartData, songTitle, difficulty, onGameEnd }, ref) => {
   const [notes, setNotes] = useState([])
   const [gameState, setGameState] = useState({
     score: 0,
@@ -119,6 +119,7 @@ function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [hitEffects, setHitEffects] = useState([false, false, false, false])
   const [comboScale, setComboScale] = useState(1)
+  const [isMobile, setIsMobile] = useState(false)
   
   const noteManagerRef = useRef(null)
   const judgmentSystemRef = useRef(null)
@@ -128,6 +129,9 @@ function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
   useEffect(() => {
     noteManagerRef.current = new NoteManager(chartData)
     judgmentSystemRef.current = new JudgmentSystem()
+    
+    // モバイル判定
+    setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
   }, [chartData])
 
   // ゲーム開始
@@ -137,6 +141,58 @@ function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
     noteManagerRef.current.reset()
     judgmentSystemRef.current.reset()
   }
+
+  // ノーツヒット処理（キーとタッチ共通）
+  const handleNoteHit = (laneIndex) => {
+    if (!isPlaying) return
+    
+    // ヒットエフェクト表示
+    setHitEffects(prev => {
+      const newEffects = [...prev]
+      newEffects[laneIndex] = true
+      setTimeout(() => {
+        setHitEffects(p => {
+          const ne = [...p]
+          ne[laneIndex] = false
+          return ne
+        })
+      }, 300)
+      return newEffects
+    })
+
+    const result = noteManagerRef.current.hitNote(laneIndex)
+    
+    if (result.found) {
+      const judgeResult = judgmentSystemRef.current.judge(result.timingError)
+      
+      const judgmentColors = {
+        GREAT: '#FFD700',
+        GOOD: '#90EE90',
+        NORMAL: '#87CEEB',
+        MISS: '#FF6B6B'
+      }
+
+      setGameState({
+        score: judgeResult.score,
+        combo: judgeResult.combo,
+        judgment: judgeResult.judgment,
+        judgmentColor: judgmentColors[judgeResult.judgment]
+      })
+
+      // 判定表示を一定時間後に消す
+      if (judgmentTimerRef.current) clearTimeout(judgmentTimerRef.current)
+      judgmentTimerRef.current = setTimeout(() => {
+        setGameState(prev => ({ ...prev, judgment: null }))
+      }, 500)
+    }
+  }
+
+  // 外部から呼び出せるようにする
+  useImperativeHandle(ref, () => ({
+    isPlaying,
+    startGame,
+    handleNoteHit
+  }))
 
   // コンボ演出
   useEffect(() => {
@@ -159,45 +215,7 @@ function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
 
       const laneIndex = Object.values(LANES).findIndex(lane => lane.key === e.code)
       if (laneIndex !== -1) {
-        // ヒットエフェクト表示
-        setHitEffects(prev => {
-          const newEffects = [...prev]
-          newEffects[laneIndex] = true
-          setTimeout(() => {
-            setHitEffects(p => {
-              const ne = [...p]
-              ne[laneIndex] = false
-              return ne
-            })
-          }, 300)
-          return newEffects
-        })
-
-        const result = noteManagerRef.current.hitNote(laneIndex)
-        
-        if (result.found) {
-          const judgeResult = judgmentSystemRef.current.judge(result.timingError)
-          
-          const judgmentColors = {
-            GREAT: '#FFD700',
-            GOOD: '#90EE90',
-            NORMAL: '#87CEEB',
-            MISS: '#FF6B6B'
-          }
-
-          setGameState({
-            score: judgeResult.score,
-            combo: judgeResult.combo,
-            judgment: judgeResult.judgment,
-            judgmentColor: judgmentColors[judgeResult.judgment]
-          })
-
-          // 判定表示を一定時間後に消す
-          if (judgmentTimerRef.current) clearTimeout(judgmentTimerRef.current)
-          judgmentTimerRef.current = setTimeout(() => {
-            setGameState(prev => ({ ...prev, judgment: null }))
-          }, 500)
-        }
+        handleNoteHit(laneIndex)
       }
     }
 
@@ -207,6 +225,49 @@ function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
       if (judgmentTimerRef.current) clearTimeout(judgmentTimerRef.current)
     }
   }, [isPlaying])
+
+  // ノーツヒット処理（キーとタッチ共通）
+  const handleNoteHit = (laneIndex) => {
+    // ヒットエフェクト表示
+    setHitEffects(prev => {
+      const newEffects = [...prev]
+      newEffects[laneIndex] = true
+      setTimeout(() => {
+        setHitEffects(p => {
+          const ne = [...p]
+          ne[laneIndex] = false
+          return ne
+        })
+      }, 300)
+      return newEffects
+    })
+
+    const result = noteManagerRef.current.hitNote(laneIndex)
+    
+    if (result.found) {
+      const judgeResult = judgmentSystemRef.current.judge(result.timingError)
+      
+      const judgmentColors = {
+        GREAT: '#FFD700',
+        GOOD: '#90EE90',
+        NORMAL: '#87CEEB',
+        MISS: '#FF6B6B'
+      }
+
+      setGameState({
+        score: judgeResult.score,
+        combo: judgeResult.combo,
+        judgment: judgeResult.judgment,
+        judgmentColor: judgmentColors[judgeResult.judgment]
+      })
+
+      // 判定表示を一定時間後に消す
+      if (judgmentTimerRef.current) clearTimeout(judgmentTimerRef.current)
+      judgmentTimerRef.current = setTimeout(() => {
+        setGameState(prev => ({ ...prev, judgment: null }))
+      }, 500)
+    }
+  }
 
   // ゲームループ
   useFrame(() => {
@@ -340,23 +401,56 @@ function GameSceneContent({ chartData, songTitle, difficulty, onGameEnd }) {
       {!isPlaying && (
         <Text
           position={[0, -1, 1]}
-          fontSize={0.8}
+          fontSize={isMobile ? 0.6 : 0.8}
           color="white"
           outlineWidth={0.03}
           outlineColor="#000000"
         >
-          Press SPACE to Start
+          {isMobile ? 'Tap to Start' : 'Press SPACE to Start'}
         </Text>
       )}
     </>
   )
-}
+})
 
 export default function GameScene({ chartData, songTitle, difficulty, onGameEnd }) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+  }, [])
+
+  const handleTouchButton = (laneIndex, isPlaying, handleNoteHit, startGame) => {
+    if (!isPlaying) {
+      startGame()
+    } else {
+      handleNoteHit(laneIndex)
+    }
+  }
+
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#0a0a1a' }}>
+    <div style={{ width: '100vw', height: '100vh', background: '#0a0a1a', position: 'relative' }}>
+      <GameSceneWrapper
+        chartData={chartData}
+        songTitle={songTitle}
+        difficulty={difficulty}
+        onGameEnd={onGameEnd}
+        onTouchButton={handleTouchButton}
+        isMobile={isMobile}
+      />
+    </div>
+  )
+}
+
+// GameSceneWrapperコンポーネント
+function GameSceneWrapper({ chartData, songTitle, difficulty, onGameEnd, onTouchButton, isMobile }) {
+  const contentRef = useRef()
+
+  return (
+    <>
       <Canvas>
         <GameSceneContent
+          ref={contentRef}
           chartData={chartData}
           songTitle={songTitle}
           difficulty={difficulty}
@@ -364,34 +458,65 @@ export default function GameScene({ chartData, songTitle, difficulty, onGameEnd 
         />
       </Canvas>
       
-      {/* キーガイド */}
+      {/* キーガイド - PCとスマホで切り替え */}
       <div style={{
         position: 'absolute',
-        bottom: '30px',
+        bottom: isMobile ? '20px' : '30px',
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
-        gap: '20px'
+        gap: isMobile ? '10px' : '20px',
+        width: '100%',
+        maxWidth: isMobile ? '95%' : '400px',
+        justifyContent: 'center'
       }}>
         {Object.entries(LANES).map(([idx, lane]) => (
-          <div key={idx} style={{
-            width: '70px',
-            height: '70px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: lane.color,
-            borderRadius: '50%',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            color: 'white',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            border: '3px solid rgba(255,255,255,0.5)'
-          }}>
+          <div
+            key={idx}
+            onClick={() => {
+              if (contentRef.current) {
+                if (!contentRef.current.isPlaying) {
+                  contentRef.current.startGame()
+                } else {
+                  contentRef.current.handleNoteHit(parseInt(idx))
+                }
+              }
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault()
+              if (contentRef.current) {
+                if (!contentRef.current.isPlaying) {
+                  contentRef.current.startGame()
+                } else {
+                  contentRef.current.handleNoteHit(parseInt(idx))
+                }
+              }
+            }}
+            style={{
+              width: isMobile ? 'calc(25% - 10px)' : '70px',
+              height: isMobile ? 'calc(25vw - 10px)' : '70px',
+              maxHeight: '80px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              background: lane.color,
+              borderRadius: '50%',
+              fontSize: isMobile ? 'clamp(16px, 5vw, 24px)' : '24px',
+              fontWeight: 'bold',
+              color: 'white',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+              border: '3px solid rgba(255,255,255,0.5)',
+              cursor: 'pointer',
+              touchAction: 'manipulation',
+              userSelect: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              transition: 'transform 0.1s'
+            }}
+          >
             {lane.key.replace('Key', '')}
           </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }
