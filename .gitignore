@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-package-lock.json
+# package-lock.json をリポジトリに含める（CI/CDで必要）
 
 # Build outputs
 dist/
