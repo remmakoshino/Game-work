@@ -35,7 +35,7 @@ export default function Character3D({ animation = 'idle' }) {
     loader.register((parser) => new VRMLoaderPlugin(parser))
 
     loader.load(
-      '/public/models/test-game.vrm',
+      '/models/test-game.vrm',
       (gltf) => {
         const vrm = gltf.userData.vrm
         VRMUtils.removeUnnecessaryJoints(gltf.scene)
