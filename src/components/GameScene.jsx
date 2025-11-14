@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react'
+import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, Text } from '@react-three/drei'
 import * as THREE from 'three'
@@ -135,15 +135,15 @@ const GameSceneContent = forwardRef(({ chartData, songTitle, difficulty, onGameE
   }, [chartData])
 
   // ゲーム開始
-  const startGame = () => {
+  const startGame = useCallback(() => {
     setIsPlaying(true)
     startTimeRef.current = Date.now()
     noteManagerRef.current.reset()
     judgmentSystemRef.current.reset()
-  }
+  }, [])
 
   // ノーツヒット処理（キーとタッチ共通）
-  const handleNoteHit = (laneIndex) => {
+  const handleNoteHit = useCallback((laneIndex) => {
     if (!isPlaying) return
     
     // ヒットエフェクト表示
@@ -185,7 +185,7 @@ const GameSceneContent = forwardRef(({ chartData, songTitle, difficulty, onGameE
         setGameState(prev => ({ ...prev, judgment: null }))
       }, 500)
     }
-  }
+  }, [isPlaying])
 
   // 外部から呼び出せるようにする
   useImperativeHandle(ref, () => ({
@@ -224,50 +224,7 @@ const GameSceneContent = forwardRef(({ chartData, songTitle, difficulty, onGameE
       window.removeEventListener('keydown', handleKeyDown)
       if (judgmentTimerRef.current) clearTimeout(judgmentTimerRef.current)
     }
-  }, [isPlaying])
-
-  // ノーツヒット処理（キーとタッチ共通）
-  const handleNoteHit = (laneIndex) => {
-    // ヒットエフェクト表示
-    setHitEffects(prev => {
-      const newEffects = [...prev]
-      newEffects[laneIndex] = true
-      setTimeout(() => {
-        setHitEffects(p => {
-          const ne = [...p]
-          ne[laneIndex] = false
-          return ne
-        })
-      }, 300)
-      return newEffects
-    })
-
-    const result = noteManagerRef.current.hitNote(laneIndex)
-    
-    if (result.found) {
-      const judgeResult = judgmentSystemRef.current.judge(result.timingError)
-      
-      const judgmentColors = {
-        GREAT: '#FFD700',
-        GOOD: '#90EE90',
-        NORMAL: '#87CEEB',
-        MISS: '#FF6B6B'
-      }
-
-      setGameState({
-        score: judgeResult.score,
-        combo: judgeResult.combo,
-        judgment: judgeResult.judgment,
-        judgmentColor: judgmentColors[judgeResult.judgment]
-      })
-
-      // 判定表示を一定時間後に消す
-      if (judgmentTimerRef.current) clearTimeout(judgmentTimerRef.current)
-      judgmentTimerRef.current = setTimeout(() => {
-        setGameState(prev => ({ ...prev, judgment: null }))
-      }, 500)
-    }
-  }
+  }, [isPlaying, handleNoteHit])
 
   // ゲームループ
   useFrame(() => {
